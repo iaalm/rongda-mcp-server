@@ -1,9 +1,11 @@
 # server.py
-from os import environ
-from typing import List, Dict, Any
 import json
+from os import environ
+from typing import Any, Dict, List
+
 import aiohttp
 from mcp.server.fastmcp import FastMCP
+
 from rongda_mcp_server.__about__ import __version__ as version
 from rongda_mcp_server.api import comprehensive_search
 from rongda_mcp_server.models import FinancialReport

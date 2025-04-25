@@ -1,5 +1,6 @@
 from typing import List
-from rongda_mcp_server.helpers import login, DEFAULT_HEADERS
+
+from rongda_mcp_server.helpers import DEFAULT_HEADERS, login
 from rongda_mcp_server.models import FinancialReport
 
 
