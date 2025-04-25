@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-rongda-mcp-server = "rongda_mcp_server:main"
+rongda-mcp-server = "rongda_mcp_server.__main__:start_server"
 
 [build-system]
 requires = ["hatchling"]
