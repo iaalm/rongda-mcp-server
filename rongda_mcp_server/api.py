@@ -18,7 +18,7 @@ async def comprehensive_search(security_code: str, key_words: List[str]) -> List
     payload = {
         "code_uid": 1683257028933,
         "obj": {
-            "title": key_words,
+            "title": [],
             "titleOr": [],
             "titleNot": [],
             "content": key_words,
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     
     async def main():
         try:
-            reports = await comprehensive_search("000001", ["财报"])
+            reports = await comprehensive_search("000001 平安银行", ["财报"])
             for report in reports:
                 print(report)
         except Exception as e:
