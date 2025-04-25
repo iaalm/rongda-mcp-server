@@ -16,3 +16,8 @@ mcp = FastMCP("Rongda MCP Server", version)
 @mcp.tool()
 async def search(security_code: str, key_words: List[str]) -> List[FinancialReport]:
     return await comprehensive_search(security_code, key_words)
+
+
+def start_server():
+    """Start the MCP server."""
+    mcp.run()
