@@ -1,0 +1,126 @@
+# server.py
+from os import environ
+from typing import List, Dict, Any
+import json
+import aiohttp
+from mcp.server.fastmcp import FastMCP
+from rongda_mcp_server.__about__ import __version__ as version
+from rongda_mcp_server.helpers import login
+from rongda_mcp_server.models import FinancialReport
+
+# Create an MCP server
+mcp = FastMCP("Rongda MCP Server", version)
+
+
+# Add an addition tool
+@mcp.tool()
+async def search(security_code: str, key_words: List[str]) -> List[FinancialReport]:
+    """Search Rongda's financial report database."""
+    # API endpoint
+    url = "https://doc.rongdasoft.com/api/web-server/xp/comprehensive/search"
+    
+    # Prepare headers
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/plain, */*',
+        'Sec-Fetch-Site': 'same-origin',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Sec-Fetch-Mode': 'cors',
+        'Origin': 'https://doc.rongdasoft.com',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15',
+        'Sec-Fetch-Dest': 'empty',
+        'xp_version': '3941',
+        'Priority': 'u=3, i'
+    }
+    
+    # Format security code for request
+    sec_codes = [f"{security_code} "] if " " not in security_code else [security_code]
+    
+    # Prepare request payload
+    payload = {
+        "code_uid": 1683257028933,
+        "obj": {
+            "title": key_words,
+            "titleOr": [],
+            "titleNot": [],
+            "content": key_words,
+            "contentOr": [],
+            "contentNot": [],
+            "sectionTitle": [],
+            "sectionTitleOr": [],
+            "sectionTitleNot": [],
+            "intelligentContent": "",
+            "type": "2",
+            "sortField": "pubdate",
+            "order": "desc",
+            "pageNum": 1,
+            "pageSize": 20,
+            "startDate": "",
+            "endDate": "",
+            "secCodes": sec_codes,
+            "secCodeCombo": [],
+            "secCodeComboName": [],
+            "notice_code": [],
+            "area": [],
+            "seniorIndustry": [],
+            "industry_code": [],
+            "seniorPlate": [],
+            "plateList": []
+        },
+        "model": "comprehensive",
+        "model_new": "comprehensive",
+        "searchSource": "manual"
+    }
+    
+    try:
+        # Use aiohttp client session for async requests
+        async with (await login(environ["RD_USER"], environ["RD_PASS"])) as session:
+            # Make the API request
+            async with session.post(url, headers=headers, json=payload) as response:
+                # Check if the request was successful
+                if response.status == 200:
+                    # Parse the JSON response
+                    data = await response.json()
+                    
+                    # Create a list to store the FinancialReport objects
+                    reports = []
+                    
+                    # Process each report in the response
+                    for item in data.get("datas", []):
+                        # Clean up HTML tags from title
+                        title = item.get("title", "")
+                        if "<font" in title:
+                            title = title.replace("<font style='color:red;'>", "").replace("</font>", "")
+                        
+                        # Create digest/content from the highlight fields
+                        content = ""
+                        if "digest" in item:
+                            content = item.get("digest", "")
+                            content = content.replace("<div class='doc-digest-row'>", "\n").replace("</div>", "")
+                            content = content.replace("<font style='color:red;'>", "").replace("</font>", "")
+                        
+                        # Create a FinancialReport object
+                        report = FinancialReport(
+                            title=title,
+                            content=content,
+                            downpath=item.get("downpath", ""),
+                            htmlpath=item.get("htmlpath", ""),
+                            dateStr=item.get("dateStr", ""),
+                            secCode=item.get("secCode", ""),
+                            secName=item.get("secName", ""),
+                            industry=item.get("industry", ""),
+                            noticeTypeName=item.get("noticeTypeName", [])
+                        )
+                        
+                        reports.append(report)
+                    
+                    return reports
+                else:
+                    # Return empty list on error
+                    print(f"Error: API request failed with status code {response.status}")
+                    return []
+    
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return []
