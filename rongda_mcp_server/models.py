@@ -5,6 +5,7 @@ from dataclasses import dataclass
 @dataclass
 class FinancialReport:
     """Represents a financial report document from the Rongda database."""
+
     title: str
     content: str
     downpath: str
