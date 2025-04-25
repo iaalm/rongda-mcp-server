@@ -11,7 +11,7 @@ class FinancialReport:
     downpath: str
     htmlpath: Optional[str]
     dateStr: str
-    secCode: str
-    secName: str
+    security_code: str
     industry: Optional[str] = None
     noticeTypeName: Optional[List[str]] = None
+

@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Optional
 
-from rongda_mcp_server.helpers import DEFAULT_HEADERS, login
+from rongda_mcp_server.helpers import DEFAULT_HEADERS, login, search_stock_hint
 from rongda_mcp_server.models import FinancialReport
 
 
 async def comprehensive_search(
-    security_code: str, key_words: List[str]
+    security_code: List[str], key_words: List[str], search_security_code: bool = True
 ) -> List[FinancialReport]:
     """Search Rongda's financial report database."""
     # API endpoint
@@ -14,9 +14,6 @@ async def comprehensive_search(
     # Prepare headers using DEFAULT_HEADERS
     headers = DEFAULT_HEADERS.copy()
     headers["Content-Type"] = "application/json"
-
-    # Format security code for request
-    sec_codes = [f"{security_code} "] if " " not in security_code else [security_code]
 
     # Prepare request payload
     payload = {
@@ -39,7 +36,7 @@ async def comprehensive_search(
             "pageSize": 20,
             "startDate": "",
             "endDate": "",
-            "secCodes": sec_codes,
+            "secCodes": security_code,
             "secCodeCombo": [],
             "secCodeComboName": [],
             "notice_code": [],
@@ -68,8 +65,13 @@ async def comprehensive_search(
                     # Create a list to store the FinancialReport objects
                     reports = []
                     if data.get("datas", None) is None:
-                        print("No data found in the response.")
-                        return []
+                        if search_security_code and len(security_code) == 1:
+                            print("No data found, trying to search by security code.")
+                            new_security_code = await search_stock_hint(security_code[0])
+                            comprehensive_search(session=session, security_code=new_security_code, key_words=key_words, search_security_code=False)
+                        else:
+                            print("No data found in the response.")
+                            return []
 
                     # Process each report in the response
                     for item in data.get("datas", []):
@@ -98,9 +100,7 @@ async def comprehensive_search(
                             downpath=item.get("downpath", ""),
                             htmlpath=item.get("htmlpath", ""),
                             dateStr=item.get("dateStr", ""),
-                            secCode=item.get("secCode", ""),
-                            secName=item.get("secName", ""),
-                            industry=item.get("industry", ""),
+                            security_code=item.get("secCode", "") + " " + item.get("secName", ""),
                             noticeTypeName=item.get("noticeTypeName", []),
                         )
 
@@ -110,7 +110,7 @@ async def comprehensive_search(
                 else:
                     # Return empty list on error
                     print(
-                        f"Error: API request failed with status code {response.status}"
+                        f"Error: API request failed with status code {response.status}, response: {await response.text()}"
                     )
                     return []
 
@@ -125,7 +125,9 @@ if __name__ == "__main__":
 
     async def main():
         try:
-            reports = await comprehensive_search("000001 平安银行", ["财报"])
+            # Example for comprehensive_search
+            print("Testing comprehensive_search:")
+            reports = await comprehensive_search(["平安银行"], ["财报"])
             for report in reports:
                 print(report)
         except Exception as e:
