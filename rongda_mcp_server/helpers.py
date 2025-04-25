@@ -10,6 +10,21 @@ from cryptography.hazmat.primitives.serialization import load_der_public_key
 from cryptography.hazmat.backends import default_backend
 
 
+# Default headers for API requests
+DEFAULT_HEADERS = {
+    'Accept': 'application/json, text/plain, */*',
+    'Sec-Fetch-Site': 'same-origin',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Sec-Fetch-Mode': 'cors',
+    'Origin': 'https://doc.rongdasoft.com',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15',
+    'Sec-Fetch-Dest': 'empty',
+    'Priority': 'u=3, i',
+    'xp_version': '3941'
+}
+
+
 async def get_public_key_str(session: aiohttp.ClientSession) -> Tuple[str, int]:
     """
     Get the public key from the Rongda API.
@@ -27,23 +42,9 @@ async def get_public_key_str(session: aiohttp.ClientSession) -> Tuple[str, int]:
     # API endpoint
     url = "https://doc.rongdasoft.com/api/user-server/system/getPublicKey"
     
-    # Prepare headers
-    headers = {
-        'Accept': 'application/json, text/plain, */*',
-        'Sec-Fetch-Site': 'same-origin',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Sec-Fetch-Mode': 'cors',
-        'Origin': 'https://doc.rongdasoft.com',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15',
-        'Sec-Fetch-Dest': 'empty',
-        'Priority': 'u=3, i',
-        'xp_version': '3941'
-    }
-    
     try:
         # Make the API request
-        async with session.post(url, headers=headers) as response:
+        async with session.post(url, headers=DEFAULT_HEADERS) as response:
             # Check if the request was successful
             if response.status == 200:
                 # Parse the JSON response
@@ -137,20 +138,9 @@ async def login(username: str, password: str) -> aiohttp.ClientSession:
         # API endpoint for login
         url = "https://doc.rongdasoft.com/api/user-server/system/login"
         
-        # Prepare headers
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json, text/plain, */*',
-            'Sec-Fetch-Site': 'same-origin',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Sec-Fetch-Mode': 'cors',
-            'Origin': 'https://doc.rongdasoft.com',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15',
-            'Sec-Fetch-Dest': 'empty',
-            'Priority': 'u=3, i',
-            'xp_version': '3941'
-        }
+        # Add content type header for form submission
+        headers = DEFAULT_HEADERS.copy()
+        headers['Content-Type'] = 'application/x-www-form-urlencoded'
         
         # Prepare form data
         form_data = {
@@ -171,7 +161,7 @@ async def login(username: str, password: str) -> aiohttp.ClientSession:
                 print(f"Session cookies: {session.cookie_jar}")
                 print(f"Session headers: {session.headers}")
                 print(f"Session response: {response_data}")
-                print(f"Session token: {response_data["data"]["accessToken"]}")
+                print(f"Session token: {response_data['data']['accessToken']}")
                 return session
             else:
                 error_msg = response_data.get("msg", "Unknown error")

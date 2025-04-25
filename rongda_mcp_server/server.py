@@ -5,7 +5,7 @@ import json
 import aiohttp
 from mcp.server.fastmcp import FastMCP
 from rongda_mcp_server.__about__ import __version__ as version
-from rongda_mcp_server.helpers import login
+from rongda_mcp_server.helpers import login, DEFAULT_HEADERS
 from rongda_mcp_server.models import FinancialReport
 
 # Create an MCP server
@@ -19,20 +19,9 @@ async def search(security_code: str, key_words: List[str]) -> List[FinancialRepo
     # API endpoint
     url = "https://doc.rongdasoft.com/api/web-server/xp/comprehensive/search"
     
-    # Prepare headers
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json, text/plain, */*',
-        'Sec-Fetch-Site': 'same-origin',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Sec-Fetch-Mode': 'cors',
-        'Origin': 'https://doc.rongdasoft.com',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3.1 Safari/605.1.15',
-        'Sec-Fetch-Dest': 'empty',
-        'xp_version': '3941',
-        'Priority': 'u=3, i'
-    }
+    # Prepare headers using DEFAULT_HEADERS
+    headers = DEFAULT_HEADERS.copy()
+    headers['Content-Type'] = 'application/json'
     
     # Format security code for request
     sec_codes = [f"{security_code} "] if " " not in security_code else [security_code]
