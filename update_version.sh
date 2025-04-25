@@ -18,6 +18,6 @@ fi
 
 hatch version $number
 v=$(hatch version)
-git commit rongda-mcp-server/__about__.py -m "Bump version to $v" --no-verify
+git commit rongda_mcp_server/__about__.py -m "Bump version to $v" --no-verify
 git tag v$v
 git push origin HEAD --tags
