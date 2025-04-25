@@ -187,30 +187,29 @@ async def login(username: str, password: str) -> aiohttp.ClientSession:
         raise
 
 
-
 async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> List[str]:
     """Search Rongda's database for stocks based on a keyword hint.
-    
+
     Args:
         hint_key: The keyword to search for (e.g. company name)
-        
+
     Returns:
         List of StockHint objects matching the search term
     """
     # API endpoint
     url = f"https://doc.rongdasoft.com/api/web-server/xp/3947/searchStockHint"
-    
+
     # Prepare query parameters
     params = {
         "stockType": "comprehensive",
         "searchAfter": "",
         "hintKey": hint_key,
     }
-    
+
     # Prepare headers using DEFAULT_HEADERS
     headers = DEFAULT_HEADERS.copy()
     headers["Accept"] = "application/json, text/plain, */*"
-    
+
     try:
         # Make the API request
         async with session.get(url, headers=headers, params=params) as response:
@@ -218,32 +217,37 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
             if response.status == 200:
                 # Parse the JSON response
                 data = await response.json()
-                
+
                 # Check if the response is successful and contains data
                 if data.get("code") == 200 and data.get("success") and "data" in data:
+                    print(f"Response data: {data}")
                     # Create a list to store the StockHint objects
                     stock_hints = []
-                    
+
                     # Process each stock in the response
                     for item in data.get("data", []):
-                        # Create a StockHint object
-                        stock_hint = StockHint(
-                            id=item.get("id", ""),
-                            stock_code=item.get("stock_code", ""),
-                            stock_name=item.get("stock_name", ""),
-                            stock_code_short=item.get("stock_code_short", ""),
-                            stock_type=item.get("stock_type", ""),
-                            oldNameType=item.get("oldNameType", False),
-                            stock_old_name=item.get("stock_old_name"),
-                            stock_name_short=item.get("stock_name_short"),
-                            delist_flag=item.get("delist_flag"),
-                            create_time=item.get("create_time"),
-                            update_time=item.get("update_time")
+                        #     # Create a StockHint object
+                        #     stock_hint = StockHint(
+                        #         id=item.get("id", ""),
+                        #         stock_code=item.get("stock_code", ""),
+                        #         stock_name=item.get("stock_name", ""),
+                        #         stock_code_short=item.get("stock_code_short", ""),
+                        #         stock_type=item.get("stock_type", ""),
+                        #         oldNameType=item.get("oldNameType", False),
+                        #         stock_old_name=item.get("stock_old_name"),
+                        #         stock_name_short=item.get("stock_name_short"),
+                        #         delist_flag=item.get("delist_flag"),
+                        #         create_time=item.get("create_time"),
+                        #         update_time=item.get("update_time")
+                        #     )
+
+                        stock_hints.append(
+                            item.get("stock_code_short", "")
+                            + " "
+                            + item.get("stock_name")
                         )
-                        
-                        stock_hints.append(stock_hint)
-                    
-                    return [i.stock_code_short + " " + i.stock_name for i in stock_hints]
+
+                    return stock_hints
                 else:
                     print(f"Error in response: {data.get('retMsg', 'Unknown error')}")
                     return []
@@ -251,7 +255,7 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
                 # Return empty list on error
                 print(f"Error: API request failed with status code {response.status}")
                 return []
-    
+
     except Exception as e:
         print(f"Exception in search_stock_hint: {str(e)}")
         raise

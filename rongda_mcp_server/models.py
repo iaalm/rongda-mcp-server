@@ -14,4 +14,3 @@ class FinancialReport:
     security_code: str
     industry: Optional[str] = None
     noticeTypeName: Optional[List[str]] = None
-
