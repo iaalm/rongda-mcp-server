@@ -15,8 +15,13 @@ mcp = FastMCP("Rongda MCP Server", version)
 
 
 # Add an addition tool
-@mcp.tool()
-async def search(security_code: str, key_words: List[str]) -> List[FinancialReport]:
+@mcp.tool(
+    "search_disclosure_documents",
+    description="Search for listed company disclosure documents in the Rongda database",
+)
+async def search_disclosure_documents(
+    security_code: str, key_words: List[str]
+) -> List[FinancialReport]:
     return await comprehensive_search(security_code, key_words)
 
 
