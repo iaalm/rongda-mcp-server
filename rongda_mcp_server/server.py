@@ -1,7 +1,8 @@
 # server.py
+from datetime import datetime
 import json
 from os import environ
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal, Optional
 
 import aiohttp
 from mcp.server.fastmcp import FastMCP
@@ -20,9 +21,9 @@ mcp = FastMCP("Rongda MCP Server", version)
     description="Search for listed company disclosure documents in the Rongda database",
 )
 async def search_disclosure_documents(
-    security_code: str, key_words: List[str]
+    company_name: str, key_words: List[str], start_time: Optional[datetime] = None, end_time: Optional[datetime] = None, report_type: Optional[Literal["AnnualReports", "QuarterlyReports"]] = None
 ) -> List[FinancialReport]:
-    return await comprehensive_search(security_code, key_words)
+    return await comprehensive_search(company_name, key_words)
 
 
 def start_server():

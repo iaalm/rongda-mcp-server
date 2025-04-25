@@ -1,4 +1,5 @@
 from typing import List, Optional
+from os import environ
 
 from rongda_mcp_server.helpers import DEFAULT_HEADERS, login, search_stock_hint
 from rongda_mcp_server.models import FinancialReport
@@ -136,7 +137,6 @@ async def comprehensive_search(
 if __name__ == "__main__":
     # Example usage
     import asyncio
-    from os import environ
 
     async def main():
         try:
