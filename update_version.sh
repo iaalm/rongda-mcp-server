@@ -16,8 +16,8 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-python3 -m hatch version $number
-v=$(python3 -m hatch version)
+hatch version $number
+v=$(hatch version)
 git commit rongda-mcp-server/__about__.py -m "Bump version to $v" --no-verify
 git tag c$v
 git push origin HEAD --tags
