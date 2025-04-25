@@ -20,4 +20,5 @@ async def search(security_code: str, key_words: List[str]) -> List[FinancialRepo
 
 def start_server():
     """Start the MCP server."""
+    print(f"Starting MCP Server ({version})...")
     mcp.run()
