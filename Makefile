@@ -4,3 +4,6 @@ dev:
 format:
 	uvx isort .
 	uvx black .
+
+lint:
+	uv run mypy .

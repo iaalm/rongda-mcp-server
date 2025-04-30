@@ -27,3 +27,14 @@ path = "rongda_mcp_server/__about__.py"
 
 [tool.isort]
 profile = "black"
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+
+[[tool.uv.index]]
+url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+]

@@ -1,6 +1,6 @@
 # rongda-mcp-server
 
-# MCP setup
+## MCP setup
 ```json
 {
   "mcpServers": {
@@ -31,4 +31,9 @@ or
     }
   }
 }
+```
+
+## Dev
+```
+uv sync
 ```
