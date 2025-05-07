@@ -8,7 +8,8 @@ import aiohttp
 from mcp.server.fastmcp import FastMCP
 
 from rongda_mcp_server.__about__ import __version__ as version
-from rongda_mcp_server.api import comprehensive_search
+from rongda_mcp_server.api import comprehensive_search, search_stock_hint
+from rongda_mcp_server.login import login
 from rongda_mcp_server.models import FinancialReport
 
 # Create an MCP server
@@ -23,7 +24,9 @@ mcp = FastMCP("Rongda MCP Server", version)
 async def search_disclosure_documents(
     company_name: str, key_words: List[str], start_time: Optional[datetime] = None, end_time: Optional[datetime] = None, report_type: Optional[Literal["AnnualReports", "QuarterlyReports"]] = None
 ) -> List[FinancialReport]:
-    return await comprehensive_search(company_name, key_words)
+    async with await login(environ["RD_USER"], environ["RD_PASS"]) as session:
+        expanded_code = await search_stock_hint(session, company_name)
+        return await comprehensive_search(session, expanded_code, key_words)
 
 
 def start_server():
