@@ -134,9 +134,9 @@ async def comprehensive_search(
             # Create a list to store the FinancialReport objects
             reports = []
             # Process each report in the response
-            for item in data.get("datas", []):
+            for item in data.get("datas") or []:
                 # Clean up HTML tags from title
-                title = item.get("title", "")
+                title = item.get("title") or ""
                 if "<font" in title:
                     title = title.replace(
                         "<font style='color:red;'>", ""
@@ -145,7 +145,7 @@ async def comprehensive_search(
                 # Create digest/content from the highlight fields
                 content = ""
                 if "digest" in item:
-                    content = item.get("digest", "")
+                    content = item.get("digest") or ""
                     content = content.replace(
                         "<div class='doc-digest-row'>", "\n"
                     ).replace("</div>", "")
@@ -157,8 +157,8 @@ async def comprehensive_search(
                 report = FinancialReport(
                     title=title,
                     content=content,
-                    downpath=item.get("downpath", ""),
-                    htmlpath=item.get("htmlpath", ""),
+                    downpath=item.get("downpath") or "",
+                    htmlpath=item.get("htmlpath") or "",
                     dateStr=item.get("dateStr", ""),
                     security_code=str(item.get("secCode", ""))
                     + " "
@@ -189,7 +189,7 @@ if __name__ == "__main__":
             for code in expanded_code:
                 print(code)
                 
-            reports = await comprehensive_search(session, ["平安银行"], ["财报"])
+            reports = await comprehensive_search(session, ["000001 平安银行"], ["财报"])
             for report in reports:
                 print(report)
 
