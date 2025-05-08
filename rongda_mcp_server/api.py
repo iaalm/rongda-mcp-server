@@ -1,12 +1,11 @@
-from typing import List, Optional
 from os import environ
+from typing import List, Optional
 
 import aiohttp
 from loguru import logger
 
 from rongda_mcp_server.login import DEFAULT_HEADERS, login
 from rongda_mcp_server.models import FinancialReport
-
 
 
 async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> List[str]:
@@ -63,22 +62,26 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
                     #     )
 
                     stock_hints.append(
-                        item.get("stock_code_short", "")
-                        + " "
-                        + item.get("stock_name")
+                        item.get("stock_code_short", "") + " " + item.get("stock_name")
                     )
 
                 return stock_hints
             else:
-                logger.error(f"Error in response: {data.get('retMsg', 'Unknown error')}")
+                logger.error(
+                    f"Error in response: {data.get('retMsg', 'Unknown error')}"
+                )
                 return []
         else:
             # Return empty list on error
-            logger.error(f"Error: API request failed with status code {response.status}")
+            logger.error(
+                f"Error: API request failed with status code {response.status}"
+            )
             return []
 
+
 async def comprehensive_search(
-    session:  aiohttp.ClientSession, security_code: List[str], key_words: List[str]) -> List[FinancialReport]:
+    session: aiohttp.ClientSession, security_code: List[str], key_words: List[str]
+) -> List[FinancialReport]:
     """Search Rongda's financial report database."""
     # API endpoint
     url = "https://doc.rongdasoft.com/api/web-server/xp/comprehensive/search"
@@ -86,7 +89,6 @@ async def comprehensive_search(
     # Prepare headers using DEFAULT_HEADERS
     headers = DEFAULT_HEADERS.copy()
     headers["Content-Type"] = "application/json"
-
 
     # Prepare request payload
     payload = {
@@ -139,9 +141,9 @@ async def comprehensive_search(
                 # Clean up HTML tags from title
                 title = item.get("title") or ""
                 if "<font" in title:
-                    title = title.replace(
-                        "<font style='color:red;'>", ""
-                    ).replace("</font>", "")
+                    title = title.replace("<font style='color:red;'>", "").replace(
+                        "</font>", ""
+                    )
 
                 # Create digest/content from the highlight fields
                 content = ""
@@ -150,9 +152,9 @@ async def comprehensive_search(
                     content = content.replace(
                         "<div class='doc-digest-row'>", "\n"
                     ).replace("</div>", "")
-                    content = content.replace(
-                        "<font style='color:red;'>", ""
-                    ).replace("</font>", "")
+                    content = content.replace("<font style='color:red;'>", "").replace(
+                        "</font>", ""
+                    )
 
                 # Create a FinancialReport object
                 report = FinancialReport(
@@ -189,7 +191,7 @@ if __name__ == "__main__":
             expanded_code = await search_stock_hint(session, "平安银行")
             for code in expanded_code:
                 print(code)
-                
+
             reports = await comprehensive_search(session, ["000001 平安银行"], ["财报"])
             for report in reports:
                 print(report)

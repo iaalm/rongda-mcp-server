@@ -4,14 +4,14 @@ Helper functions for the Rongda MCP Server.
 
 import base64
 from typing import Any, Dict, List, Optional, Tuple, Union
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from loguru import logger
 
 import aiohttp
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from cryptography.hazmat.primitives.serialization import load_der_public_key
+from loguru import logger
 
 # Default headers for API requests
 DEFAULT_HEADERS = {
@@ -65,7 +65,9 @@ async def get_public_key_str(session: aiohttp.ClientSession) -> Tuple[str, int]:
                     raise ValueError("Unexpected API response format")
             else:
                 # Handle error status
-                logger.error(f"Error: API request failed with status code {response.status}")
+                logger.error(
+                    f"Error: API request failed with status code {response.status}"
+                )
                 raise Exception(
                     f"API request failed with status code {response.status}"
                 )
