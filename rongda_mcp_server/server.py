@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 from os import environ
 from typing import Any, Dict, List, Literal, Optional
+from loguru import logger
 
 import aiohttp
 from mcp.server.fastmcp import FastMCP
@@ -31,5 +32,5 @@ async def search_disclosure_documents(
 
 def start_server():
     """Start the MCP server."""
-    print(f"Starting MCP Server ({version})...")
+    logger.verbose(f"Starting MCP Server ({version})...")
     mcp.run()

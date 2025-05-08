@@ -5,6 +5,7 @@ Helper functions for the Rongda MCP Server.
 import base64
 from typing import Any, Dict, List, Optional, Tuple, Union
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+from loguru import logger
 
 import aiohttp
 from cryptography.hazmat.backends import default_backend
@@ -60,17 +61,17 @@ async def get_public_key_str(session: aiohttp.ClientSession) -> Tuple[str, int]:
 
                     return public_key, timestamp
                 else:
-                    print(f"Error: Unexpected API response format: {data}")
+                    logger.error(f"Error: Unexpected API response format: {data}")
                     raise ValueError("Unexpected API response format")
             else:
                 # Handle error status
-                print(f"Error: API request failed with status code {response.status}")
+                logger.error(f"Error: API request failed with status code {response.status}")
                 raise Exception(
                     f"API request failed with status code {response.status}"
                 )
 
     except Exception as e:
-        print(f"Error getting public key: {str(e)}")
+        logger.error(f"Error getting public key: {str(e)}")
         raise
 
 
@@ -117,7 +118,7 @@ def encrypt_with_public_key(
         return base64.b64encode(encrypted_data).decode("utf-8")
 
     except Exception as e:
-        print(f"Encryption error: {str(e)}")
+        logger.error(f"Encryption error: {str(e)}")
         raise
 
 
@@ -170,16 +171,16 @@ async def login(username: str, password: str) -> aiohttp.ClientSession:
                 and response_data.get("code") == 200
                 and response_data.get("success")
             ):
-                print("Login successful")
+                logger.info("Login successful")
                 # Return the session with cookies already set from the response
-                print(f"Session cookies: {session.cookie_jar}")
-                print(f"Session headers: {session.headers}")
-                print(f"Session response: {response_data}")
-                print(f"Session token: {response_data['data']['accessToken']}")
+                logger.debug(f"Session cookies: {session.cookie_jar}")
+                logger.debug(f"Session headers: {session.headers}")
+                logger.debug(f"Session response: {response_data}")
+                logger.debug(f"Session token: {response_data['data']['accessToken']}")
                 return session
             else:
                 error_msg = response_data.get("msg", "Unknown error")
-                print(f"Login failed: {error_msg}")
+                logger.error(f"Login failed: {error_msg}")
                 # Close the session since login failed
                 await session.close()
                 raise ValueError(f"Login failed: {error_msg}")
@@ -187,7 +188,7 @@ async def login(username: str, password: str) -> aiohttp.ClientSession:
     except Exception as e:
         # Make sure to close the session on any error
         await session.close()
-        print(f"Login error: {str(e)}")
+        logger.exception(f"Login error")
         raise
 
 

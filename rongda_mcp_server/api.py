@@ -2,6 +2,7 @@ from typing import List, Optional
 from os import environ
 
 import aiohttp
+from loguru import logger
 
 from rongda_mcp_server.login import DEFAULT_HEADERS, login
 from rongda_mcp_server.models import FinancialReport
@@ -40,7 +41,7 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
 
             # Check if the response is successful and contains data
             if data.get("code") == 200 and data.get("success") and "data" in data:
-                print(f"Response data: {data}")
+                logger.debug(f"Response data: {data}")
                 # Create a list to store the StockHint objects
                 stock_hints = []
 
@@ -69,11 +70,11 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
 
                 return stock_hints
             else:
-                print(f"Error in response: {data.get('retMsg', 'Unknown error')}")
+                logger.error(f"Error in response: {data.get('retMsg', 'Unknown error')}")
                 return []
         else:
             # Return empty list on error
-            print(f"Error: API request failed with status code {response.status}")
+            logger.error(f"Error: API request failed with status code {response.status}")
             return []
 
 async def comprehensive_search(
@@ -129,7 +130,7 @@ async def comprehensive_search(
         if response.status == 200:
             # Parse the JSON response
             data = await response.json()
-            print(f"Response data: {data}")
+            logger.debug(f"Response data: {data}")
 
             # Create a list to store the FinancialReport objects
             reports = []
@@ -171,7 +172,7 @@ async def comprehensive_search(
             return reports
         else:
             # Return empty list on error
-            print(
+            logger.error(
                 f"Error: API request failed with status code {response.status}, response: {await response.text()}"
             )
             return []
