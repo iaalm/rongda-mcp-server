@@ -9,7 +9,15 @@ from loguru import logger
 from mcp.server.fastmcp import FastMCP
 
 from rongda_mcp_server.__about__ import __version__ as version
-from rongda_mcp_server.api import comprehensive_search, search_stock_hint
+from rongda_mcp_server.api import (
+    SearchResult, 
+    comprehensive_search, 
+    download_report_html,
+    extract_keyword_context, 
+    search_keywords, 
+    search_stock_hint
+)
+
 from rongda_mcp_server.login import login
 from rongda_mcp_server.models import FinancialReport
 
