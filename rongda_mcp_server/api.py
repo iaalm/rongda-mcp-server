@@ -80,7 +80,7 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
 
 
 async def comprehensive_search(
-    session: aiohttp.ClientSession, security_code: List[str], key_words: List[str]
+    session: aiohttp.ClientSession, security_code: List[str], key_words: List[str], title: List[str] = []
 ) -> List[FinancialReport]:
     """Search Rongda's financial report database."""
     # API endpoint
@@ -94,7 +94,7 @@ async def comprehensive_search(
     payload = {
         "code_uid": 1683257028933,
         "obj": {
-            "title": [],
+            "title": title,
             "titleOr": [],
             "titleNot": [],
             "content": key_words,
