@@ -25,21 +25,26 @@ from rongda_mcp_server.models import FinancialReport
 mcp = FastMCP("Rongda MCP Server", version)
 
 
-# Add an addition tool
 @mcp.tool(
     "search_disclosure_documents",
-    description="Search for listed company disclosure documents in the Rongda database",
+    description='Search for listed company disclosure documents in the Rongda database.\n'
+                'Note: The company_name should in format of "000001 平安银行". \n'
+                'Note: The body_key_words should be information you looking for in report body, like "主营业务收入".\n'
+                'Note: The title_keywords should be information you looking for in report title, like "年度报告".'
+    # "The report_type is either 'AnnualReports' or 'QuarterlyReports'."
 )
 async def search_disclosure_documents(
     company_name: str,
-    key_words: List[str],
+    body_key_words: List[str],
+    title_keywords: List[str],
     start_time: Optional[datetime] = None,
     end_time: Optional[datetime] = None,
-    report_type: Optional[Literal["AnnualReports", "QuarterlyReports"]] = None,
+    # report_type: Optional[Literal["AnnualReports", "QuarterlyReports"]] = None,
 ) -> List[FinancialReport]:
     async with await login(environ["RD_USER"], environ["RD_PASS"]) as session:
-        expanded_code = await search_stock_hint(session, company_name)
-        return await comprehensive_search(session, expanded_code, key_words)
+        # expanded_code = await search_stock_hint(session, company_name)
+        expanded_code = [company_name]
+        return await comprehensive_search(session, expanded_code, body_key_words, title_keywords)
 
 
 def start_server():
