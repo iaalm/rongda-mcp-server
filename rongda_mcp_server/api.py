@@ -155,13 +155,13 @@ async def comprehensive_search(
                     content = content.replace("<font style='color:red;'>", "").replace(
                         "</font>", ""
                     )
-
+                print(item)
                 # Create a FinancialReport object
                 report = FinancialReport(
                     title=title,
                     content=content,
                     downpath=item.get("downpath") or "",
-                    htmlpath=item.get("htmlpath") or "",
+                    htmlpath=item.get("htmlPath") or "",
                     dateStr=item.get("dateStr", ""),
                     security_code=str(item.get("secCode", ""))
                     + " "
@@ -399,6 +399,7 @@ def extract_keyword_context(
         }
 
 
+
 if __name__ == "__main__":
     # Example usage
     import asyncio
@@ -410,9 +411,12 @@ if __name__ == "__main__":
             expanded_code = await search_stock_hint(session, "药明康德")
             for code in expanded_code:
                 print(code)
-
+            
             reports = await comprehensive_search(session, ["603259 药明康德"], ["管理费用"])
             for report in reports:
                 print(report)
+            
+            report = await download_report_html(session=session, report=reports[0])
+            print(report)
 
     asyncio.run(main())
