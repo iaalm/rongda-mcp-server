@@ -155,7 +155,7 @@ async def comprehensive_search(
                     content = content.replace("<font style='color:red;'>", "").replace(
                         "</font>", ""
                     )
-                print(item)
+                # print(item)
                 # Create a FinancialReport object
                 report = FinancialReport(
                     title=title,
