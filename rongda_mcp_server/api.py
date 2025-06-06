@@ -1,3 +1,5 @@
+from enum import Enum
+from functools import reduce
 from os import environ
 from typing import List, Optional
 from dataclasses import dataclass
@@ -7,6 +9,9 @@ from loguru import logger
 
 from rongda_mcp_server.login import DEFAULT_HEADERS, login
 from rongda_mcp_server.models import FinancialReport, ReportContent, SearchResult
+
+class ReportType(Enum):
+    ANNUAL_REPORT = "annual_report"
 
 async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> List[str]:
     """Search Rongda's database for stocks based on a keyword hint.
@@ -80,7 +85,7 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
 
 
 async def comprehensive_search(
-    session: aiohttp.ClientSession, security_code: List[str], key_words: List[str], title: List[str] = []
+    session: aiohttp.ClientSession, security_code: List[str], key_words: List[str], title: List[str] = [], report_types: List[ReportType] = []
 ) -> List[FinancialReport]:
     """Search Rongda's financial report database."""
     # API endpoint
@@ -89,6 +94,11 @@ async def comprehensive_search(
     # Prepare headers using DEFAULT_HEADERS
     headers = DEFAULT_HEADERS.copy()
     headers["Content-Type"] = "application/json"
+
+    report_type_mapping = {
+        ReportType.ANNUAL_REPORT: ["a_category_ndbg_szsh","h_nt1-40000-40100"]
+    }
+    notice_code = reduce(lambda x, y: x + y, [report_type_mapping[report_type] for report_type in report_types], [])
 
     # Prepare request payload
     payload = {
@@ -114,7 +124,7 @@ async def comprehensive_search(
             "secCodes": security_code,
             "secCodeCombo": [],
             "secCodeComboName": [],
-            "notice_code": [],
+            "notice_code": notice_code,
             "area": [],
             "seniorIndustry": [],
             "industry_code": [],
