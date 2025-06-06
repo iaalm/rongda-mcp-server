@@ -45,7 +45,7 @@ async def search_stock_hint(session: aiohttp.ClientSession, hint_key: str) -> Li
 
             # Check if the response is successful and contains data
             if data.get("code") == 200 and data.get("success") and "data" in data:
-                logger.debug(f"Response data: {data}")
+                logger.trace(f"Response data: {data}")
                 # Create a list to store the StockHint objects
                 stock_hints = []
 
