@@ -39,3 +39,9 @@ url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 dev = [
     "mypy>=1.15.0",
 ]
+
+[tool.hatch.build]
+artifacts = [
+    "rongda_mcp_server/*.pyi",
+    "rongda_mcp_server/py.typed"
+]
